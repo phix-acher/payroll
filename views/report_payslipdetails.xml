@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template id="report_payslipdetails">
+        <!-- <t t-call="web.html_container"> -->
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <div class="watermark">
+                        <img t-att-src="'data:image/png;base64,%s' % res_company.maker_logo.decode('utf-8')" style="position: absolute; top: 0; left: 5%; z-index: -1; width: 95%;"/>
+                    </div>
+                    <!-- Styles background-color: #f5f5f5; -->
+                    <style>
+                        .page {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            
+                        }
+                        .school-name {
+                            font-size: 22px;
+                            font-weight: bold;
+                            margin: 0 0 5px 0;
+                            text-transform: uppercase;
+                            color: #000;
+                            text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+                        }
+                        .school-details {
+                            font-size: 12px;
+                            margin: 2px 0;
+                            color: #333;
+                            text-transform: uppercase;
+                        }
+                        .payslip-container p {
+                            margin: 2px 0;
+                            line-height: 1.1;
+                        }
+                        .table td {
+                            padding: 2px 4px !important;
+                        }
+                        .payslip-title {
+                            font-size: 20px;
+                            font-weight: bold;
+                            text-align: center;
+                            margin: 15px 0 0 0;
+                            text-decoration: underline;
+                            color: #000;
+                            clear: both;
+                        }
+                        .info-value {
+                            font-weight: bold;
+                            color: #000;
+                            font-family: 'Courier New', monospace;
+                        }
+                        .footer-info {
+                            padding: 15px 20px;
+                            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+                            border-top: 1px solid #ccc;
+                            font-size: 11px;
+                        }
+                        
+                        .prepared-on {
+                            font-style: italic;
+                            color: #666;
+                            text-align: center;
+                        }
+                       
+                    </style>
+                    <div class="payslip-container">
+                        <!-- Header Section -->
+                        <div class="row payslip-header clearfix">
+                            <div class="school-logo col-4">
+                                <img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" style="max-height: 150px; max-width: 150px; background-color: rgba(255, 255, 0, 0.3);"/>
+                            </div>
+                            <div class="school-info col-8">
+                                <h3 class="school-name"><t t-esc="o.company_id.name or 'COMPANY NAME'"/></h3>
+                                <p class="school-details">Loc: <t t-esc="o.company_id.street or 'Company Address'"/></p>
+                                <p class="school-details">Tel: <t t-esc="o.company_id.phone or 'Company Phone'"/></p>
+                                <p class="school-details">Email: <t t-esc="o.company_id.email"/></p>
+                            </div>
+                        </div>
+                        <h4 class="payslip-title" style="text-align: center;  text-decoration: underline; font-weight: bold;">PAY SLIP</h4>
+
+                        <!-- employee info -->
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td>
+                                    <div>
+                                        <span>Employee name : </span>
+                                        <span class="info-value" t-field="o.employee_id.name"/>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Employee ID : <span class="info-value" t-field="o.employee_id.identification_id"/></p>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr style="height: 5px;"/>
+                        <!-- Slip info -->
+                        <div class="row">
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td>
+                                            <p>Payment No. : 
+                                                <span class="info-value" t-field="o.number"/>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>PayMonth : 
+                                                <span class="info-value">
+                                                    <t t-esc="o.date_from.strftime('%B %Y') if o.date_from else ''"/>
+                                                </span>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Received Amt : 
+                                                <span class="info-value">
+                                                    <t t-esc="'{:,.2f}'.format(sum([line.total for line in o.line_ids if line.category_id.code == 'NET']))"/><t t-esc="o.company_id.currency_id.symbol"/>
+                                                </span>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Pay Status : 
+                                                <span class="info-value" style="color: green;" t-esc="o.state.title() if o.state else 'Cleared'"/>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td>
+                                            <p>Payment Date : 
+                                                <span class="info-value">
+                                                    <t t-esc="o.date_to.strftime('%d-%b-%y') if o.date_to else ''"/>
+                                                </span>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Paid by : <span class="info-value"><t t-esc="o.company_id.name or 'COMPANY NAME'"/> - Accounts Dept.</span></p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Bank : <span class="info-value"><t t-esc="o.employee_id.bank_account_id.bank_id.name or 'CASH'"/></span></p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Bank a/c : <span class="info-value"><t t-esc="o.employee_id.bank_account_id.acc_number or 'N/A'"/></span></p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <hr style="height: 5px;"/>
+                        <br/><br/>
+                        <h4 class="info-value">Salary Breakdwon Details :</h4>
+                        <div class="row">
+                            <div class="col-6">
+                                <p style="text-align: center; text-decoration: underline; font-weight: bold;">Earnings</p>
+                                <table class="table table-sm table-borderless">
+                                    <!-- Loop through earnings data -->
+                                    <t t-foreach="get_details_by_rule_category.get(o.id, [])" t-as="line">
+                                        <t t-if="line['code'] in ['BASIC', 'ALLOWANCES'] and line['level'] == 0 and line['total'] > 0">
+                                            <tr>
+                                                <td><t t-esc="line['name']"/> :</td>
+                                                <td class="info-value"><t t-esc="'{:,.0f}'.format(line['total'])"/><t t-esc="o.company_id.currency_id.symbol"/></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                    <br/><br/>
+                                    <!-- Gross Total -->
+                                    <t t-foreach="get_details_by_rule_category.get(o.id, [])" t-as="line">
+                                        <t t-if="line['code'] == 'GROSS' and line['level'] == 0">
+                                            <tr style="border-top: 1px solid #000; font-weight: bold;">
+                                                <td>Gross Total :</td>
+                                                <td class="info-value"><t t-esc="'{:,.0f}'.format(line['total'])"/><t t-esc="o.company_id.currency_id.symbol"/></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <p style="text-align: center; text-decoration: underline; font-weight: bold;">Deductions</p>
+                                <br/>
+                                <table class="table table-sm table-borderless">
+
+                                    <t t-foreach="get_details_by_rule_category.get(o.id, [])" t-as="line">
+                                        <t t-if="line['type'] == 'deduction' and line['level'] == 1">
+                                            <tr>
+                                                <td><t t-esc="line['name']" /> :</td>
+                                                <td class="info-value"><t t-esc="'{:,.0f}'.format(line['total'])" /><t t-esc="o.company_id.currency_id.symbol"/></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+
+                                    <!-- Total Deductions -->
+                                    <t t-foreach="get_details_by_rule_category.get(o.id, [])" t-as="line">
+                                        <t t-if="line['code'] == 'DEDUCTIONS' and line['level'] == 0">
+                                            <tr style="border-top: 1px solid #000; font-weight: bold;">
+                                                <td>Total Deductions :</td>
+                                                <td class="info-value"><t t-esc="'{:,.0f}'.format(line['total'])" /><t t-esc="o.company_id.currency_id.symbol"/></td>
+                                            </tr>
+                                        </t>
+                                    </t>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Net Salary Section -->
+                        <div class="row" style="margin-top: 20px;">
+                            <div class="col-12" style="text-align: center; background-color: #f0f8ff; padding: 10px; border: 2px solid #000;">
+                                <t t-foreach="get_details_by_rule_category.get(o.id, [])" t-as="line">
+                                    <t t-if="line['code'] == 'NET' and line['level'] == 0">
+                                        <h4 class="info-value">NET SALARY: <t t-esc="'{:,.2f}'.format(line['total'])"/><t t-esc="o.company_id.currency_id.symbol"/></h4>
+                                    </t>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- Footer Information -->
+                        <div class="footer-info">
+                            <div class="prepared-on">
+                                <strong>Prepared on:</strong> <t t-esc="o.create_date.strftime('%B %Y') if o.create_date else ''"/>
+                            </div>
+                        </div>
+                    <!-- container tag -->
+                    </div>
+                </div>
+
+            </t>
+        </t>
+    </template>
+</odoo>

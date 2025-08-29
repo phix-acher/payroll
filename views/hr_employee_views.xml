@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Employee View -->
+    <record id="hr_employee_view_form" model="ir.ui.view">
+        <field name="name">hr.employee.view.form.payroll</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button
+                    name="%(hr_payslip_action_employee)d"
+                    class="oe_stat_button"
+                    icon="fa-money"
+                    type="action"
+                    groups="payroll.group_payroll_user"
+                >
+                    <field name="payslip_count" widget="statinfo" string="Payslips" />
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="My Loans">
+                    <group>
+                        <field name="loan_amount"/>
+                    </group>
+                </page> 
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_employee_loan_tree" model="ir.ui.view">
+        <field name="name">hr.employee.loan.tree</field>
+        <field name="model">employee.loan</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="employee_id"/>
+                <field name="name"/>
+                <field name="amount"/>
+                <field name="paid" column_invisible="1"/>
+                <field name="tag_status" widget="badge" decoration-success="paid" decoration-danger="not paid"/>
+                <button name="action_mark_loan_as_paid" type="object" string="Mark as paid" invisible="paid"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hr_loan_manager_action" model="ir.actions.act_window">
+        <field name="name">Employee Loans</field>
+        <field name="res_model">employee.loan</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p>Empty record !</p>
+        </field>
+    </record>
+    <menuitem
+        id="hr_loan_manager_menu"
+        name="Employee Loan"
+        action="hr_loan_manager_action"
+        parent="payroll_menu_root"
+        sequence="2"
+        groups="payroll.group_payroll_manager"
+    />
+</odoo>

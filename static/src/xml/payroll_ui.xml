@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates id="template" xml:space="preserve">
+    <t t-name="MainPortal">
+        <div class="oh_dashboards container my-5">
+            <t t-call="Payroll_Dashboard_Header"/>
+            <!-- Year Selector -->
+            <div class="text-center mb-4">
+                <select t-model="state.selectedYearId" t-on-change="onYearChange"
+                        class="form-select w-auto mx-auto">
+                    <t t-foreach="state.workingYears" t-as="year" t-key="year.id">
+                        <option t-att-value="year.id" t-att-selected="year.id === state.selectedYearId">
+                            <t t-esc="year.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+            <!-- Payslip List -->
+            <t t-if="state.loading">
+                <div class="text-center text-muted my-4">Loading...</div>
+            </t>
+            <t t-else="">
+                <div class="card shadow-sm">
+                    <div class="card-header fw-bold">Available Payslips</div>
+                    <ul class="list-group list-group-flush">
+                        <t t-foreach="state.payslips" t-as="slip" t-key="slip.id">
+                            <li class="list-group-item">
+                                <span t-on-click="onPayslipClick" t-att-data-payslip-id="slip.id" 
+                                      class="fw-semibold text-decoration-none text-primary" 
+                                      style="cursor: pointer;">
+                                    <t t-esc="slip.name"/>
+                                </span>
+                                <div class="text-muted small">
+                                    Period : <t t-esc="slip.date_from"/> - <t t-esc="slip.date_to"/>
+                                </div>
+                            </li>
+                        </t>
+                        <t t-if="!state.payslips.length">
+                            <li class="list-group-item text-muted">No payslips found for this year.</li>
+                        </t>
+                    </ul>
+                </div>
+            </t>
+        </div>
+    </t>
+    <t t-name="Payroll_Dashboard_Header">
+        <h2 class="fw-bold mb-4">My Payslips</h2>
+    </t>
+</templates>
