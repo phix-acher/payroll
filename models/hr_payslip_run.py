@@ -68,6 +68,7 @@ class HrPayslipRun(models.Model):
     billed = fields.Boolean(default=False)
 
     @api.depends('slip_ids')
+    @api.onchange('slip_ids')
     def _compute_total_salary(self):
         for rec in self:
             if rec.slip_ids:
@@ -90,7 +91,7 @@ class HrPayslipRun(models.Model):
 
         for batch in self:
             if not batch.total_amount:
-                raise ValidationError("Cannot create expense: total salary is zero.")
+                raise ValidationError(f"Cannot create expense: total salary is {batch.total_amount}.")
 
             expense_vals = {
                 "name": f"Salary Expense - {batch.name}",
@@ -104,6 +105,7 @@ class HrPayslipRun(models.Model):
 
             expense = expense_obj.create(expense_vals)
             batch.billed = True
+
         return expense
 
 
