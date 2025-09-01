@@ -75,4 +75,31 @@ result = categories.BASIC + categories.ALLOWANCES - categories.DEDUCTIONS
         </field>
         <field name="register_id" ref="contrib_register_employees" />
     </record>
+
+    <!-- deductions (snnit) (Tax) -->
+    <record id="hr_rule_ssnit" model="hr.salary.rule">
+        <field name="name">SSNIT</field>
+        <field name="sequence" eval="150" />
+        <field name="category_id" ref="payroll.DED" />
+        <field name="line_type">deduction</field>
+        <field name="condition_select">python</field>
+        <field name="condition_python">
+result = contract.is_ssn == True
+        </field>
+        <field name="amount_select">percentage</field>
+        <field name="amount_percentage_base">contract.wage</field>
+        <field name="amount_percentage" eval="5.5" />
+    </record>
+    <record id="hr_rule_tax" model="hr.salary.rule">
+        <field name="name">Tax</field>
+        <field name="sequence" eval="151" />
+        <!-- <field name="code">TAX</field> -->
+        <field name="category_id" ref="payroll.DED" />
+        <field name="line_type">deduction</field>
+        <field name="condition_select">none</field>
+        <field name="amount_select">code</field>
+        <field name="amount_python_compute">
+result = contract.tax
+        </field>
+    </record>
 </odoo>

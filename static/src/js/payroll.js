@@ -5,12 +5,12 @@ import { Component, useState, onWillStart } from "@odoo/owl";
 import { useService } from "@web/core/utils/hooks";
 
 class PayrollUI extends Component {
-    static props = {
-        workingYears: { type: Array, optional: true },
-        selectedYearId: { type: Number, optional: true },
-        payslips: { type: Array, optional: true },
-        loading: { type: Boolean, optional: true },
-    };
+    // static props = {
+    //     workingYears: { type: Array, optional: true },
+    //     selectedYearId: { type: Number, optional: true },
+    //     payslips: { type: Array, optional: true },
+    //     loading: { type: Boolean, optional: true },
+    // };
     
     setup() {
         this.orm = useService("orm");

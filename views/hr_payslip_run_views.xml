@@ -38,7 +38,7 @@
                 <field name="name" />
                 <field name="date_start" decoration-bf="1" />
                 <field name="date_end" decoration-bf="1" />
-                <field name="total_amount"/>
+                <!-- <field name="total_amount"/> -->
                 <field name="activity_ids" widget="list_activity" optional="show" />
                 <field name="credit_note" />
                 <field
@@ -109,17 +109,17 @@
                     <button
                         name="action_create_expense"
                         type="object"
-                        string="Add to Expenses"
-                        invisible="state != 'draft'"
+                        string="Procees Payment"
+                        invisible="state != 'draft' or billed"
                         class="btn btn-info"
                     />
-                    <button
+                    <!-- <button
                         name="close_payslip_run"
                         type="object"
                         string="Close"
                         invisible="state != 'draft'"
                         class="oe_highlight"
-                    />
+                    /> -->
                     <button
                         name="%(action_hr_payslip_by_employees)d"
                         type="action"
@@ -136,6 +136,9 @@
                     <field name="state" widget="statusbar" />
                 </header>
                 <sheet>
+                    <div name="button_box" class="oe_button_box">
+                        <button class="oe_stat_button" name="action_open_related_expenses" type="object" string="Expenses" icon="fa-money"/>
+                    </div>
                     <label for="name" class="oe_edit_only" />
                     <h1>
                         <field name="name" readonly="state != 'draft'" />
@@ -160,6 +163,7 @@
                         <group name="other">
                             <field name="struct_id" readonly="state != 'draft'" />
                             <field name="credit_note" readonly="state != 'draft'" />
+                            <field name="billed" readonly="state != 'draft'" />
                         </group>
                     </group>
                     <separator string="Payslips" />

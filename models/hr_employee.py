@@ -73,3 +73,7 @@ class HrEmployee(models.Model):
         outstanding_loan_amount = loan_ids.mapped('amount')
         self.loan_amount = sum(outstanding_loan_amount)
         return True
+
+
+
+    

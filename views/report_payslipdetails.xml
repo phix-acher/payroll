@@ -233,7 +233,7 @@
                         <!-- Footer Information -->
                         <div class="footer-info">
                             <div class="prepared-on">
-                                <strong>Prepared on:</strong> <t t-esc="o.create_date.strftime('%B %Y') if o.create_date else ''"/>
+                                <strong>Prepared on:</strong> <t t-esc="o.create_date.strftime('%m-%d-%Y') if o.create_date else ''"/>
                             </div>
                         </div>
                     <!-- container tag -->

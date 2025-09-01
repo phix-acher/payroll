@@ -27,7 +27,7 @@
         />
     </record>
     <record id="base.default_user" model="res.users">
-        <field name="groups_id" eval="[(4,ref('payroll.group_payroll_manager'))]" />
+        <field name="groups_id" eval="[(4,ref('payroll.group_payroll_portal_user'))]" />
     </record>
     <record id="hr_payroll_rule_officer" model="ir.rule">
         <field name="name">Officer and subordinates Payslip</field>

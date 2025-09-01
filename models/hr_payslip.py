@@ -76,7 +76,7 @@ class HrPayslip(models.Model):
         [
             ("draft", "Draft"),
             ("verify", "Waiting"),
-            ("cleared", "Cleared"),
+            ("done", "Cleared"),
             ("cancel", "Rejected"),
         ],
         string="Status",
@@ -87,7 +87,7 @@ class HrPayslip(models.Model):
         tracking=True,
         help="""* When the payslip is created the status is \'Draft\'
         \n* If the payslip is under verification, the status is \'Waiting\'.
-        \n* If the payslip is confirmed then status is set to \'Cleared\'.
+        \n* If the payslip is confirmed then status is set to \'Done\'.
         \n* When user cancel payslip the status is \'Rejected\'.""",
     )
     line_ids = fields.One2many(
@@ -233,7 +233,7 @@ class HrPayslip(models.Model):
             and not self.prevent_compute_on_confirm
         ):
             self.compute_sheet()
-        return self.write({"state": "cleared"})
+        return self.write({"state": "done"})
 
     def action_payslip_cancel(self):
         for payslip in self:
@@ -246,8 +246,8 @@ class HrPayslip(models.Model):
                         )
                     )
             else:
-                if self.filtered(lambda slip: slip.state == "cleared"):
-                    raise UserError(_("Cannot cancel a payslip that is cleared."))
+                if self.filtered(lambda slip: slip.state == "done"):
+                    raise UserError(_("Cannot cancel a payslip that is done."))
         return self.write({"state": "cancel"})
 
     def refund_sheet(self):

@@ -64,48 +64,72 @@ class HrPayslipRun(models.Model):
         "of the employee valid for the chosen period",
     )
     # Total to expense
-    total_amount = fields.Float(string="Total Salary", compute="_compute_total_salary", store=True)
     billed = fields.Boolean(default=False)
-
-    @api.depends('slip_ids')
-    @api.onchange('slip_ids')
-    def _compute_total_salary(self):
-        for rec in self:
-            if rec.slip_ids:
-                total = rec.slip_ids.mapped('net_salary')
-                rec.total_amount = sum(total)
-
 
     def draft_payslip_run(self):
         return self.write({"state": "draft"})
 
-    def close_payslip_run(self):
-        if not self.billed:
-            raise ValidationError(f"Create an expense bill for this salary run.")
-        return self.write({"state": "close"})
+    # def close_payslip_run(self):
+    #     if not self.billed:
+    #         raise ValidationError(f"Create an expense bill for this salary run.")
+    #     return self.write({"state": "close"})
+    
 
+    def action_open_related_expenses(self):
+        """Open the related expenses for this payslip batch"""
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Related Expenses",
+            "res_model": "hr.expense",
+            "domain": [("payslip_run_id", "=", self.id)],
+            "view_mode": "tree,form",
+            "context": {"create": False},
+        }
 
     def action_create_expense(self):
-        """Create an expense record for this payslip batch"""
+        """Create an expense record for this payslip batch and close it"""
         expense_obj = self.env["hr.expense"]
+        product_obj = self.env["product.product"]
+
+        # process slips to done if not.
+        for slip in self.slip_ids:
+            if slip.state == "done":
+                continue
+            else:
+                slip.state = "done"
+
+        # find default_code [SLY] 
+        product = product_obj.search([('default_code', '=', 'SLY')], limit=1)
+        if not product:
+            # create product if not found
+            new_product = product_obj.create(
+                {"name": "Salary Expense", "default_code": "SLY", "type": "service"}
+            )
+            product = new_product
 
         for batch in self:
-            if not batch.total_amount:
-                raise ValidationError(f"Cannot create expense: total salary is {batch.total_amount}.")
+            total_amount = sum(batch.slip_ids.mapped('net_salary'))
+            if batch.billed:
+                raise ValidationError(f"Expense already created for payslip batch {batch.name}.")
+            # if not batch.total_amount:
+            #     raise ValidationError(f"Cannot create expense: total salary is {batch.total_amount}.")
 
             expense_vals = {
                 "name": f"Salary Expense - {batch.name}",
                 "employee_id": self.env.user.employee_id.id,  # Linked to current user's employee
-                "unit_amount": batch.total_amount,
-                "quantity": 1,
+                "total_amount_currency": total_amount,
                 "payslip_run_id": batch.id,
                 "company_id": batch.company_id.id,
                 "currency_id": batch.company_id.currency_id.id,
+                "payment_mode": "company_account",
+                "product_id": product.id,
             }
 
             expense = expense_obj.create(expense_vals)
+            expense.action_submit_expenses()
             batch.billed = True
-
+            batch.write({"state": "close"})
+            self.env.user.notify_info(message=f"Expense created for payslip batch {batch.name}.")
         return expense
 
 
