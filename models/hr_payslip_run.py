@@ -65,6 +65,7 @@ class HrPayslipRun(models.Model):
     )
     # Total to expense
     billed = fields.Boolean(default=False)
+    
 
     def draft_payslip_run(self):
         return self.write({"state": "draft"})

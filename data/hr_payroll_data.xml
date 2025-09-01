@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo noupdate="0">
+    <record id="hr_working_year" model="hr.working_year">
+        <field name="name">2025</field>
+    </record>
     <!-- Decimal Precision -->
     <record forcecreate="True" id="decimal_payroll" model="decimal.precision">
         <field name="name">Payroll</field>

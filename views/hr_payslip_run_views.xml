@@ -163,7 +163,7 @@
                         <group name="other">
                             <field name="struct_id" readonly="state != 'draft'" />
                             <field name="credit_note" readonly="state != 'draft'" />
-                            <field name="billed" readonly="state != 'draft'" />
+                            <field name="billed" readonly="1" widget="boolean_toggle"/>
                         </group>
                     </group>
                     <separator string="Payslips" />
